@@ -1,0 +1,60 @@
+name: C25K
+
+options:
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+  generateEmptyDirectories: true
+
+# The signing team comes from Config/Secrets.xcconfig, which is gitignored.
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    CODE_SIGN_STYLE: Automatic
+    CURRENT_PROJECT_VERSION: "1"
+    MARKETING_VERSION: "1.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    SWIFT_EMIT_LOC_STRINGS: YES
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+
+schemes:
+  C25K:
+    build:
+      targets:
+        C25K: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+
+targets:
+  C25K:
+    type: application
+    platform: iOS
+    sources:
+      - path: C25K
+    configFiles:
+      Debug: Config/Secrets.xcconfig
+      Release: Config/Secrets.xcconfig
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.izaro.c25k
+        PRODUCT_NAME: C25K
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        GENERATE_INFOPLIST_FILE: NO
+    info:
+      path: C25K/Info.plist
+      properties:
+        CFBundleDisplayName: Couch to 5K
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        # The design is light-mode only by intent.
+        UIUserInterfaceStyle: Light
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait

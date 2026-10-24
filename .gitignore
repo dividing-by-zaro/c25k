@@ -1,0 +1,17 @@
+# Local signing secrets — never commit Apple Developer account identifiers.
+Config/Secrets.xcconfig
+
+# XcodeGen output — regenerate with `xcodegen generate`
+*.xcodeproj
+*.xcworkspace
+
+# Xcode
+DerivedData/
+build/
+*.xcuserstate
+xcuserdata/
+.DS_Store
+
+# Local API keys (Cartesia, used by Tools/make_voice.py)
+.env
+.env.*
