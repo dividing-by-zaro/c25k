@@ -23,7 +23,7 @@
 
 ## Hear the voice
 
-▶️ [Play the voice preview](docs/voice-preview.mp4)
+▶️ [Play the voice preview](https://cdn.jsdelivr.net/gh/dividing-by-zaro/c25k@main/docs/voice-preview.mp4) (18 seconds: warm-up, run, walk, cool-down, finish)
 
 The voice is "Gemma" from [Cartesia](https://cartesia.ai). Every cue is in [`C25K/Voice`](C25K/Voice).
 
