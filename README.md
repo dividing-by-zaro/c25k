@@ -23,7 +23,7 @@
 
 ## Hear the voice
 
-18 seconds of cues: warm-up, run, walk, cool-down, finish. Turn your sound on.
+About 20 seconds of cues: warm-up, run, walk, cool-down, finish. Turn your sound on.
 
 https://github.com/user-attachments/assets/9c4cc729-e71e-4ae7-a941-0e84e7a8329e
 
