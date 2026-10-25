@@ -5,10 +5,10 @@
 <p align="center"><b>Couch to 5K</b><br>A simple, green iPhone app that gets you from the couch to running 5K in nine weeks.</p>
 
 <p align="center">
-  <img src="screenshots/home.png" width="200" alt="Home screen">
-  <img src="screenshots/detail.png" width="200" alt="A day's plan">
-  <img src="screenshots/workout.png" width="200" alt="During a workout">
-  <img src="screenshots/celebration.png" width="200" alt="Celebration after a workout">
+  <img src="screenshots/framed/home.png" width="210" alt="Home screen">
+  <img src="screenshots/framed/detail.png" width="210" alt="A day's plan">
+  <img src="screenshots/framed/workout.png" width="210" alt="During a workout">
+  <img src="screenshots/framed/celebration.png" width="210" alt="Celebration after a workout">
 </p>
 
 ## What it does
@@ -58,3 +58,5 @@ Your key is only used on your computer to make the clips. It never goes into the
 ## How it's built
 
 SwiftUI and SwiftData, iOS 17 and up. The workout plan lives in `C25K/Model/Program.swift`, the timer in `C25K/Workout`, and the screens in `C25K/Views`.
+
+The phone frames on the screenshots are drawn by `Tools/frame_screenshots.py`.
