@@ -23,9 +23,9 @@
 
 ## Hear the voice
 
-About 20 seconds of cues: warm-up, run, walk, cool-down, finish. Turn your sound on.
+About 18 seconds of cues, with captions. Turn your sound on.
 
-https://github.com/user-attachments/assets/9c4cc729-e71e-4ae7-a941-0e84e7a8329e
+https://github.com/user-attachments/assets/59f6f74d-64c0-47e9-9588-3cf86610dfaf
 
 The voice is "Gemma" from [Cartesia](https://cartesia.ai). Every cue is in [`C25K/Voice`](C25K/Voice).
 
