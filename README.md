@@ -5,10 +5,10 @@
 <p align="center"><b>Couch to 5K</b><br>A simple, green iPhone app that gets you from the couch to running 5K in nine weeks.</p>
 
 <p align="center">
-  <img src="screenshots/framed/home.png" width="210" alt="Home screen">
-  <img src="screenshots/framed/detail.png" width="210" alt="A day's plan">
-  <img src="screenshots/framed/workout.png" width="210" alt="During a workout">
-  <img src="screenshots/framed/celebration.png" width="210" alt="Celebration after a workout">
+  <img src="screenshots/framed/home.png" width="190" alt="Home screen">
+  <img src="screenshots/framed/detail.png" width="190" alt="A day's plan">
+  <img src="screenshots/framed/workout.png" width="190" alt="During a workout">
+  <img src="screenshots/framed/celebration.png" width="190" alt="Celebration after a workout">
 </p>
 
 ## What it does
