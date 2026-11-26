@@ -1,7 +1,7 @@
 import Foundation
 
 /// One timed stretch of a workout.
-struct Segment: Hashable {
+struct Segment: Hashable, Codable {
     enum Kind: String, Codable {
         case warmup, run, walk, cooldown
 
@@ -29,18 +29,55 @@ struct Segment: Hashable {
 
     let kind: Kind
     let seconds: Int
+    /// Speak a check-in every five minutes ("10 minutes, nice work").
+    /// Set on run blocks from the workout builder.
+    var checkIns = false
+
+    /// Offsets into the segment that get a check-in: every 5 minutes, up to
+    /// 40 (the clips `Tools/make_voice.py` makes), and never at the very end,
+    /// where the next segment's cue takes over.
+    var checkInOffsets: [Int] {
+        guard checkIns else { return [] }
+        return Array(stride(from: 300, through: min(seconds - 1, 2400), by: 300))
+    }
 }
 
-/// A single day of the plan, e.g. Week 3 | Day 2.
-struct Workout: Identifiable, Hashable {
+/// A single day of the plan, e.g. Week 3 | Day 2, or a workout from the
+/// builder.
+struct Workout: Identifiable, Hashable, Codable {
+    let id: String
+    let title: String
+    /// 0 for a workout from the builder.
     let week: Int
     let day: Int
     let segments: [Segment]
     /// One-line description in the plan's own words.
     let summary: String
+    /// Ends when you stop it, not when the clock runs out: the last block
+    /// loops until you tap Finish.
+    var isOpenEnded = false
 
-    var id: String { "w\(week)d\(day)" }
-    var title: String { "Week \(week) | Day \(day)" }
+    init(week: Int, day: Int, segments: [Segment], summary: String) {
+        self.id = "w\(week)d\(day)"
+        self.title = "Week \(week) | Day \(day)"
+        self.week = week
+        self.day = day
+        self.segments = segments
+        self.summary = summary
+    }
+
+    init(customTitle: String, segments: [Segment], summary: String, isOpenEnded: Bool) {
+        self.id = Self.customID
+        self.title = customTitle
+        self.week = 0
+        self.day = 0
+        self.segments = segments
+        self.summary = summary
+        self.isOpenEnded = isOpenEnded
+    }
+
+    static let customID = "custom"
+    var isCustom: Bool { week == 0 }
 
     var totalSeconds: Int { segments.reduce(0) { $0 + $1.seconds } }
     var runSeconds: Int { segments.filter { $0.kind == .run }.reduce(0) { $0 + $1.seconds } }
@@ -127,6 +164,8 @@ enum Program {
     ]
 
     static let allWorkouts: [Workout] = weeks.flatMap(\.workouts)
+
+    static let allIDs = Set(allWorkouts.map(\.id))
 
     static func workout(id: String) -> Workout? {
         allWorkouts.first { $0.id == id }

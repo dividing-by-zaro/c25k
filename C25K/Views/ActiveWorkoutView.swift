@@ -10,7 +10,8 @@ struct ActiveWorkoutView: View {
 
     var body: some View {
         if session.isFinished {
-            CelebrationView(workout: session.workout, onDone: onDone)
+            CelebrationView(workout: session.workout, runSeconds: session.runSecondsDone,
+                            walkSeconds: session.walkSecondsDone, onDone: onDone)
                 .transition(.opacity)
         } else {
             timer
@@ -44,7 +45,8 @@ struct ActiveWorkoutView: View {
                     .multilineTextAlignment(.center)
                     .contentTransition(.opacity)
                 if let pos = session.intervalPosition {
-                    Text("\(kind == .run ? "Run" : "Walk") \(pos.number) of \(pos.of)")
+                    Text("\(kind == .run ? "Run" : "Walk") \(pos.number)"
+                         + (session.workout.isOpenEnded ? "" : " of \(pos.of)"))
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Theme.mint.opacity(0.8))
                 }
@@ -80,14 +82,27 @@ struct ActiveWorkoutView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(background.ignoresSafeArea())
         .animation(.easeInOut(duration: 0.6), value: kind)
-        .confirmationDialog("End this workout?", isPresented: $confirmingEnd, titleVisibility: .visible) {
-            Button("End workout", role: .destructive) {
-                session.end()
-                onDone()
+        .confirmationDialog(session.workout.isCustom ? "Finish this workout?" : "End this workout?",
+                            isPresented: $confirmingEnd, titleVisibility: .visible) {
+            if session.workout.isCustom {
+                Button("Finish and save") { session.finishNow() }
+                Button("Discard workout", role: .destructive) {
+                    session.end()
+                    onDone()
+                }
+            } else {
+                Button("End workout", role: .destructive) {
+                    session.end()
+                    onDone()
+                }
             }
             Button("Keep going", role: .cancel) {}
         } message: {
-            Text("It won't be counted. You can check it off later if you finish it another way.")
+            if session.workout.isCustom {
+                Text("Save what you've done so far to your stats, or throw it away.")
+            } else {
+                Text("It won't be counted. You can check it off later if you finish it another way.")
+            }
         }
     }
 
@@ -100,13 +115,25 @@ struct ActiveWorkoutView: View {
                     .frame(width: 44, height: 44)
                     .background(.white.opacity(0.14), in: Circle())
             }
-            .accessibilityLabel("End workout")
+            .accessibilityLabel(session.workout.isCustom ? "Finish workout" : "End workout")
             Spacer()
             Text(session.workout.title)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.white.opacity(0.85))
             Spacer()
-            Color.clear.frame(width: 44, height: 44)
+            if session.workout.isOpenEnded {
+                // An open-ended workout only ends when you say so.
+                Button { confirmingEnd = true } label: {
+                    Text("Finish")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(background)
+                        .padding(.horizontal, 16)
+                        .frame(height: 44)
+                        .background(.white, in: Capsule())
+                }
+            } else {
+                Color.clear.frame(width: 44, height: 44)
+            }
         }
         .padding(.top, 8)
     }
@@ -137,7 +164,19 @@ struct ActiveWorkoutView: View {
         .background(.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
-    private var overallProgress: some View {
+    @ViewBuilder private var overallProgress: some View {
+        if session.workout.isOpenEnded {
+            // No end to count down to: just how long you've been going.
+            Text("\(Fmt.clock(session.elapsed, roundingUp: false)) elapsed | runs until you finish")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.white.opacity(0.7))
+                .padding(.bottom, 20)
+        } else {
+            plannedProgress
+        }
+    }
+
+    private var plannedProgress: some View {
         VStack(spacing: 8) {
             GeometryReader { geo in
                 // On the dark background: runs bright, walks softer, the rest faint.

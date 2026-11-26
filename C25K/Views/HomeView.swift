@@ -9,7 +9,8 @@ struct HomeView: View {
     @State private var detail: Workout?
     @State private var showingSettings = false
 
-    private var doneIDs: Set<String> { Set(completions.map(\.workoutID)) }
+    /// Plan days done. Builder workouts count in the stats, not here.
+    private var doneIDs: Set<String> { Set(completions.map(\.workoutID)).intersection(Program.allIDs) }
 
     /// The first workout in the plan not yet done.
     private var nextWorkout: Workout? {

@@ -24,6 +24,12 @@ final class Announcer: NSObject, AVSpeechSynthesizerDelegate, AVAudioPlayerDeleg
         say(clip: Self.clipName(segment), else: "\(segment.kind.command). \(Self.spoken(segment.seconds)).")
     }
 
+    /// "10 minutes. Nice work." — every five minutes into a long run.
+    func checkIn(_ offset: Int) {
+        haptics.notificationOccurred(.success)
+        say(clip: Self.checkInClip(offset), else: "\(offset / 60) minutes. Great job!")
+    }
+
     func finished(final: Bool) {
         haptics.notificationOccurred(.success)
         say(clip: final ? "finished-final" : "finished", else: "Workout complete. Great job!")
@@ -60,6 +66,11 @@ final class Announcer: NSObject, AVSpeechSynthesizerDelegate, AVAudioPlayerDeleg
     /// "run-90", matching the files `Tools/make_voice.py` writes.
     nonisolated static func clipName(_ segment: Segment) -> String {
         "\(segment.kind.rawValue)-\(segment.seconds)"
+    }
+
+    /// "mark-600", for the check-in 10 minutes into a run.
+    nonisolated static func checkInClip(_ offset: Int) -> String {
+        "mark-\(offset)"
     }
 
     nonisolated static func clipURL(_ name: String) -> URL? {

@@ -4,6 +4,9 @@ import SwiftUI
 /// Shown the moment a workout's last segment ends.
 struct CelebrationView: View {
     var workout: Workout
+    /// What was actually done — less than planned if finished early.
+    var runSeconds: Int
+    var walkSeconds: Int
     var onDone: () -> Void
 
     @Query private var completions: [Completion]
@@ -18,6 +21,7 @@ struct CelebrationView: View {
 
     private var message: String {
         if workout.isFinal { return "Nine weeks ago this was a 60-second jog. Look at you now." }
+        if workout.isCustom { return "That's \(Fmt.duration(runSeconds + walkSeconds)) on your own plan. Nice work!" }
         if workout.day == 3 { return "On to week \(workout.week + 1). You've earned the rest day." }
         return "That's \(workout.title) in the books. Rest up — Day \(workout.day + 1) is next."
     }
@@ -47,10 +51,10 @@ struct CelebrationView: View {
                         VStack(alignment: .leading, spacing: 14) {
                             Text("This workout").font(.headline).foregroundStyle(Theme.ink)
                             HStack(spacing: 10) {
-                                tile(Fmt.duration(workout.runSeconds), "running", "figure.run")
-                                tile(Fmt.duration(workout.walkSeconds), "walking", "figure.walk")
-                                tile(Fmt.number(Calories.estimate(runSeconds: workout.runSeconds,
-                                                                  walkSeconds: workout.walkSeconds,
+                                tile(Fmt.duration(runSeconds), "running", "figure.run")
+                                tile(Fmt.duration(walkSeconds), "walking", "figure.walk")
+                                tile(Fmt.number(Calories.estimate(runSeconds: runSeconds,
+                                                                  walkSeconds: walkSeconds,
                                                                   weightLb: weightLb)),
                                      "calories", "flame")
                             }

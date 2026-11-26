@@ -28,7 +28,8 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
 
 extension WorkoutSession: Identifiable {}
 
-/// Home, plus the full-screen workout on top of it when one is running.
+/// The plan and the workout builder as tabs, plus the full-screen workout on
+/// top of them when one is running.
 struct RootView: View {
     @Environment(\.modelContext) private var context
     @AppStorage(Calories.weightKey) private var weightLb = Calories.defaultWeightLb
@@ -36,7 +37,12 @@ struct RootView: View {
     @State private var session: WorkoutSession?
 
     var body: some View {
-        HomeView(onStart: start)
+        TabView {
+            HomeView(onStart: start)
+                .tabItem { Label("Plan", systemImage: "calendar") }
+            BuilderView(onStart: start)
+                .tabItem { Label("Build", systemImage: "square.stack.3d.up.fill") }
+        }
             .fullScreenCover(item: $session) { session in
                 ActiveWorkoutView(session: session) { self.session = nil }
             }
@@ -55,7 +61,13 @@ struct RootView: View {
     private func run(_ session: WorkoutSession) {
         session.onFinish = { [weak session] in
             guard let session else { return }
-            context.insert(Completion(workout: session.workout, weightLb: weightLb, checkedOff: false))
+            // What was actually done, which for a builder workout finished
+            // early is less than the plan.
+            let run = session.runSecondsDone, walk = session.walkSecondsDone
+            context.insert(Completion(workoutID: session.workout.id, runSeconds: run, walkSeconds: walk,
+                                      calories: Calories.estimate(runSeconds: run, walkSeconds: walk,
+                                                                  weightLb: weightLb),
+                                      checkedOff: false))
             try? context.save()
         }
         session.start()

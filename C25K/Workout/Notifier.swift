@@ -15,23 +15,45 @@ enum Notifier {
     static func schedule(workout: Workout, elapsed: TimeInterval) {
         cancelAll()
         let segments = workout.segments
-        let starts = workout.segmentStarts
+        var cues: [Cue] = []
 
-        for (i, start) in starts.enumerated() where TimeInterval(start) > elapsed {
+        for (i, start) in workout.segmentStarts.enumerated() {
             let segment = segments[i]
-            let next = i + 1 < segments.count ? segments[i + 1] : nil
-            let content = UNMutableNotificationContent()
-            content.title = segment.kind.command
-            content.body = Announcer.detail(segment, next: next)
-            add(content, in: TimeInterval(start) - elapsed, id: "segment-\(i)",
-                clip: Announcer.clipName(segment))
+            if TimeInterval(start) > elapsed {
+                let next = i + 1 < segments.count ? segments[i + 1] : nil
+                let content = UNMutableNotificationContent()
+                content.title = segment.kind.command
+                content.body = Announcer.detail(segment, next: next)
+                cues.append(Cue(at: start, id: "segment-\(i)", content: content,
+                                clip: Announcer.clipName(segment)))
+            }
+            for offset in segment.checkInOffsets where TimeInterval(start + offset) > elapsed {
+                let content = UNMutableNotificationContent()
+                content.title = "\(offset / 60) minutes"
+                content.body = "Great job. Keep running!"
+                cues.append(Cue(at: start + offset, id: "checkin-\(i)-\(offset)", content: content,
+                                clip: Announcer.checkInClip(offset)))
+            }
         }
 
         let content = UNMutableNotificationContent()
         content.title = workout.isFinal ? "You did it — 5K ready! 🎉" : "Workout complete! 🎉"
         content.body = "\(workout.title) is done. Open the app to celebrate."
-        add(content, in: TimeInterval(workout.totalSeconds) - elapsed, id: "finished",
-            clip: workout.isFinal ? "finished-final" : "finished")
+        cues.append(Cue(at: workout.totalSeconds, id: "finished", content: content,
+                        clip: workout.isFinal ? "finished-final" : "finished"))
+
+        // iOS keeps at most 64 pending; the session tops them up when the
+        // app comes back to the front.
+        for cue in cues.sorted(by: { $0.at < $1.at }).prefix(60) {
+            add(cue.content, in: TimeInterval(cue.at) - elapsed, id: cue.id, clip: cue.clip)
+        }
+    }
+
+    private struct Cue {
+        var at: Int
+        var id: String
+        var content: UNMutableNotificationContent
+        var clip: String
     }
 
     /// The cue's voice clip doubles as the notification sound, so it's spoken
